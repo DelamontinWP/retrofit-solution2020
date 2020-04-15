@@ -77,18 +77,18 @@ public class RecipeActivity extends AppCompatActivity {
                         recipe.add(new Recipe(id, namaResep, deskripsi, bahan, langkahPembuatan, foto));
                         adapter.notifyDataSetChanged();
                     }
-                    Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load data sukses", Snackbar.LENGTH_SHORT);
+                    Snackbar snackbar = Snackbar.make(mRecipeLayout, "successfully loaded data", Snackbar.LENGTH_SHORT);
                     snackbar.show();
                     page++;
                 }else {
-                    Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load data gagal", Snackbar.LENGTH_SHORT);
+                    Snackbar snackbar = Snackbar.make(mRecipeLayout, "failed loaded data", Snackbar.LENGTH_SHORT);
                     snackbar.show();
                 }
             }
 
             @Override
             public void onFailure(Call<Envelope<List<Recipe>>> call, Throwable t) {
-                Snackbar snackbar = Snackbar.make(mRecipeLayout, "gagal koneksi", Snackbar.LENGTH_SHORT);
+                Snackbar snackbar = Snackbar.make(mRecipeLayout, "Connection Failed", Snackbar.LENGTH_SHORT);
                 snackbar.show();
             }
         });
@@ -113,25 +113,25 @@ public class RecipeActivity extends AppCompatActivity {
                             recipe.add(new Recipe(id, namaResep, deskripsi, bahan, langkahPembuatan, foto));
                             adapter.notifyDataSetChanged();
                         }
-                        Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load data page "+page, Snackbar.LENGTH_SHORT);
+                        Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load Data Page "+page, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                         //ganti page selanjutnya
                         page++;
                     }else{
-                        Toast.makeText(RecipeActivity.this, "Page kosong", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RecipeActivity.this, "Empty Page", Toast.LENGTH_SHORT).show();
 
-                        Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load data page "+page, Snackbar.LENGTH_SHORT);
+                        Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load Data Page "+page, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                     }
                 }else {
-                    Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load data gagal", Snackbar.LENGTH_SHORT);
+                    Snackbar snackbar = Snackbar.make(mRecipeLayout, "Load Data Failed", Snackbar.LENGTH_SHORT);
                     snackbar.show();
                 }
             }
 
             @Override
             public void onFailure(Call<Envelope<List<Recipe>>> call, Throwable t) {
-                Snackbar snackbar = Snackbar.make(mRecipeLayout, "gagal koneksi", Snackbar.LENGTH_SHORT);
+                Snackbar snackbar = Snackbar.make(mRecipeLayout, "Connection Failed", Snackbar.LENGTH_SHORT);
                 snackbar.show();
             }
         });

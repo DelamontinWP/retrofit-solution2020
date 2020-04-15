@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     String email, password;
     private TextView mMainTxtAppName;
     private TextView mMainTxtAppVersion;
+    LoginRequest loginRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,23 +41,13 @@ public class MainActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
         mMainTxtAppName = findViewById(R.id.mainTxtAppName);
         mMainTxtAppVersion = findViewById(R.id.mainTxtAppVersion);
-
         SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         mMainTxtAppName.setText(preference.getString("appName", "default"));
         mMainTxtAppVersion.setText(preference.getString("appVersion", "default"));
     }
 
-    public void handleLoginClick(View view) {
-        email = edtEmail.getText().toString();
-        password = edtPassword.getText().toString();
-
-        doLogin();
-    }
-
-    private void doLogin() {
+    public void doLogin(){
         ApiInterface service = ServiceGenerator.createService(ApiInterface.class);
-
-        LoginRequest loginRequest = new LoginRequest(email, password);
         Call<LoginResponse> call = service.doLogin(loginRequest);
         call.enqueue(new Callback<LoginResponse>() {
             @Override
@@ -64,29 +55,30 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     SharedPreferences.Editor editor = preference.edit();
-                    editor.putString("token", response.body().getToken());
+                    editor.putString("token",response.body().getToken());
                     editor.apply();
-                    Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                    startActivity(i);
+                    Intent intent = new Intent(getApplicationContext(),ProfileActivity.class);
+                    startActivity(intent);
                 }else{
                     ApiError error = ErrorUtils.parseError(response);
-                    if (error.getError().getEmail()!= null && error.getError().getPassword()!=null){
-                        Toast.makeText(MainActivity.this, "response message : " + error.getError().getPassword().get(0) + error.getError().getEmail().get(0), Toast.LENGTH_SHORT).show();
-                    }else if(error.getError().getEmail()!= null){
+                    if (error.getError().getEmail() != null){
                         Toast.makeText(MainActivity.this, error.getError().getEmail().get(0), Toast.LENGTH_SHORT).show();
-                    }else if (error.getError().getPassword()!=null){
+                    }else if (error.getError().getPassword() != null){
                         Toast.makeText(MainActivity.this, error.getError().getPassword().get(0), Toast.LENGTH_SHORT).show();
                     }
-
                 }
-
             }
-
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Gagal Koneksi", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void handleLoginClick(View view) {
+        email = edtEmail.getText().toString();
+        password = edtPassword.getText().toString();
+        loginRequest = new LoginRequest(email, password);
+        doLogin();
     }
 
     public void handleRegisterClick(View view) {

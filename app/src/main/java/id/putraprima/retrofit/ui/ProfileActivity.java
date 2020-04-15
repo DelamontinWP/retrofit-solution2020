@@ -15,7 +15,9 @@ import androidx.annotation.Nullable;
 
 import id.putraprima.retrofit.R;
 import id.putraprima.retrofit.api.helper.ServiceGenerator;
+import id.putraprima.retrofit.api.models.ApiError;
 import id.putraprima.retrofit.api.models.Envelope;
+import id.putraprima.retrofit.api.models.ErrorUtils;
 import id.putraprima.retrofit.api.models.LoginResponse;
 import id.putraprima.retrofit.api.models.UserInfo;
 import id.putraprima.retrofit.api.services.ApiInterface;
@@ -35,7 +37,6 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         context = getApplicationContext();
         getMe();
-
         mIdText = findViewById(R.id.idText);
         mNameText = findViewById(R.id.nameText);
         mEmailText = findViewById(R.id.emailText);
@@ -56,16 +57,23 @@ public class ProfileActivity extends AppCompatActivity {
     private void getMe() {
         SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
         Toast.makeText(context, preference.getString("token", null), Toast.LENGTH_SHORT).show();
-        ApiInterface service = ServiceGenerator.createService(ApiInterface.class, "Bearer " + preference.getString("token", null));
-        Call<Envelope<UserInfo>> call = service.me();
+        //ApiInterface service = ServiceGenerator.createService(ApiInterface.class, "Bearer " + preference.getString("token", null));
+        ApiInterface service = ServiceGenerator.createService(ApiInterface.class);
+        Call<Envelope<UserInfo>> call = service.me("Bearer"+" "+preference.getString("token", null));
         call.enqueue(new Callback<Envelope<UserInfo>>() {
             @Override
             public void onResponse(Call<Envelope<UserInfo>> call, Response<Envelope<UserInfo>> response) {
-                mIdText.setText(Integer.toString(response.body().getData().getId()));
-                mNameText.setText(response.body().getData().getName());
-                mEmailText.setText(response.body().getData().getEmail());
+                if (response.isSuccessful()){
+                    mIdText.setText(Integer.toString(response.body().getData().getId()));
+                    mNameText.setText(response.body().getData().getName());
+                    mEmailText.setText(response.body().getData().getEmail());
+                }else{
+                    ApiError error = ErrorUtils.parseError(response);
+                    if (error.getError() != null){
+                        Toast.makeText(ProfileActivity.this, error.getError().toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
-
             @Override
             public void onFailure(Call<Envelope<UserInfo>> call, Throwable t) {
                 Toast.makeText(ProfileActivity.this, "Error Request", Toast.LENGTH_SHORT).show();
@@ -77,9 +85,18 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(this, UpdateProfileActivity.class);
         startActivityForResult(intent, 1);
     }
-
     public void handleUpdatePassword(View view) {
         Intent intent = new Intent(this, UpdatePasswordActivity.class);
         startActivityForResult(intent, 2);
+    }
+
+    public void handleRecipe(View view) {
+        Intent intent = new Intent(this, RecipeActivity.class);
+        startActivity(intent);
+    }
+
+    public void handleUpload(View view) {
+        Intent intent = new Intent(this, UploadActivity.class);
+        startActivity(intent);
     }
 }
